@@ -1,0 +1,8 @@
+{
+  "name": "ai-digital-twin",
+  "version": "1.0.0",
+  "description": "AI Digital Twin with Vercel Serverless Function",
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}
