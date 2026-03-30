@@ -20,8 +20,18 @@ export default async function handler(req, res) {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     
     if (!apiKey) {
+      console.error('API key not configured');
       return res.status(500).json({ error: 'API key not configured' });
     }
+
+    const requestBody = {
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      system: system,
+      messages: messages
+    };
+
+    console.log('Sending request to Anthropic API...');
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -30,23 +40,21 @@ export default async function handler(req, res) {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
-        system: system,
-        messages: messages
-      })
+      body: JSON.stringify(requestBody)
     });
 
+    const responseText = await response.text();
+    console.log('Anthropic API response status:', response.status);
+    
     if (!response.ok) {
-      const errorText = await response.text();
+      console.error('API Error:', responseText);
       return res.status(response.status).json({ 
         error: `API Error: ${response.status}`,
-        details: errorText 
+        details: responseText 
       });
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
     return res.status(200).json(data);
 
   } catch (error) {
